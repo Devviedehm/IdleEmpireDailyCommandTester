@@ -11,4 +11,4 @@ https://devviedehm.github.io/IdleEmpireDailyCommandTester/index.html
 And here's a screenshot of a previous test run, using a total of 445,300,000 rolls (nearly half a billion):
 https://devviedehm.github.io/IdleEmpireDailyCommandTester/statistics.png
 
-I hope this has been helpful, and let me know 
+I hope this has been helpful, and please let me know if you have any problems with it. :)
