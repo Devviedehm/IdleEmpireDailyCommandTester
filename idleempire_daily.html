@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Daily Command Mapper</title>
+<style>
+*{
+background:#000;
+color:#fff;
+margin:0px;
+}
+</style>
+</head>
+<body>
+<script type="text/javascript">
+function reward( threshold ){
+ return 2*Math.round(10/(1-threshold/100));
+}
+
+var rewards=[];
+var profits={};
+var max_hit = 0;
+var max_pro = 0;
+var max_div = 0;
+var total_rolls = 0;
+
+for( var i=50; i<100; i++ ){
+ profits[i] = {n:0,r:0};
+}
+
+function roll_all( nn ){
+ nn = parseInt( nn );
+ if( nn == NaN ) nn=0;
+ total_rolls += nn;
+ var n_adds = [];
+ for( var i=50; i<100; i++ ){
+  n_adds[i] = 0;
+ }
+ for( var rolls=0; rolls<nn; rolls++ ){
+  var roll = Math.ceil(Math.random()*100);
+  for( var i=50; i<100; i++ ){
+   if( roll > i ){
+    n_adds[i]++;
+   }
+  }
+ }
+ for( var i=50; i<100; i++ ){
+  profits[i].n += n_adds[i];
+  profits[i].r += n_adds[i]*rewards[i];
+ }
+ for( var i=50; i<100; i++ ){
+  if( max_hit < profits[i].n ) max_hit = profits[i].n;
+  if( max_pro < profits[i].r ) max_pro = profits[i].r;
+  var div = profits[i].r/profits[i].n;
+  if( max_div < div ) max_div = div;
+ }
+ redraw();
+ profitsort();
+}
+
+function profitsort(){
+ var ll=[];
+ for( var i=50; i<100; i++ ){
+  ll.push( [ profits[i].r, i ] );
+ }
+ ll.sort( (a,b)=>{return b[0]-a[0];} );
+ pre_r.innerHTML = "";
+ for( var i=0; i<50; i++ ){
+  if( ll[i][1]!=compare ){
+   pre_r.innerHTML += (i+1)+". "+(ll[i][1])+" - "+(ll[i][0])+"\n";
+  } else {
+   pre_r.innerHTML += "<span style='font-weight:bold;color:#0ff;'>"+(i+1)+". "+compare+" - "+(ll[i][0])+"</span>\n";
+  }
+ }
+}
+
+var t_r = 1, t_g = 1, t_y = 1, t_b = 1;
+
+var canvas, draw;
+var btn, txt;
+var compare = 54, cmpval, cmpbtn;
+var pre_r;
+
+window.addEventListener( "load", window_loaded );
+
+window.addEventListener( "resize", window_resize );
+
+function tog_btn( val, fn ){
+ var b = document.createElement( "input" );
+ b.type = "button";
+ b.value = val;
+ b.addEventListener( "click", fn );
+ document.body.appendChild( b );
+}
+
+function window_loaded(){
+ for( var i=50; i<100; i++ ){
+  rewards[i] = reward(i);
+ }
+ canvas = document.createElement( "canvas" );
+ canvas.width = document.body.clientWidth;
+ canvas.height = window.innerHeight-64;
+ draw = canvas.getContext( "2d" );
+ draw.width = canvas.width;
+ draw.height = canvas.height;
+ txt = document.createElement( "input" );
+ txt.type = "text";
+ txt.value = "365000";
+ btn = document.createElement( "input" );
+ btn.type = "button";
+ btn.value = "Roll this many times";
+ btn.addEventListener( "click", ()=>{roll_all(txt.value)} );
+ document.body.appendChild( txt );
+ document.body.appendChild( btn );
+ tog_btn( "Toggle Total Points (red)", ()=>{t_r=1-t_r;redraw();} );
+ tog_btn( "Toggle Times Won (green)", ()=>{t_g=1-t_g;redraw();} );
+ tog_btn( "Toggle Points/Wins (yellow)", ()=>{t_y=1-t_y;redraw();} );
+ tog_btn( "Toggle Percentage Wins (cyan)", ()=>{t_b=1-t_b;redraw();} );
+ cmpval = document.createElement( "input" );
+ cmpval.type = "text";
+ cmpval.value = "54";
+ cmpbtn = document.createElement( "input" );
+ cmpbtn.type = "button";
+ cmpbtn.value = "Compare to this threshold";
+ cmpbtn.addEventListener( "click", ()=>{compare=cmpval.value;redraw();profitsort();} );
+ document.body.appendChild( cmpval );
+ document.body.appendChild( cmpbtn );
+ document.body.appendChild( canvas );
+ pre_r = document.createElement( "pre" );
+ document.body.appendChild( pre_r );
+ profitsort();
+ window_resize();
+}
+
+function window_resize(){
+ canvas.width = document.body.clientWidth;
+ canvas.height = window.innerHeight-64;
+ draw.width = canvas.width;
+ draw.height = canvas.height;
+ redraw();
+}
+
+function redraw(){
+ draw.font = "bold 10px monospace";
+ draw.clearRect( 0, 0, draw.width, draw.height );
+ draw.fillStyle = "#777";
+ for( var i=0; i<50; i++ ){
+  draw.fillRect( 20+(draw.width-40)/49*i-1, 0, 2, draw.height-15 );
+ }
+ draw.fillRect( 0, draw.height-15, draw.width, 2 );
+ draw.textAlign = "center";
+ var hh = draw.height-15;
+ draw.textBaseline = "top";
+ if( t_g ){
+  draw.fillStyle = "#0f0";
+  for( var i=0; i<50; i++ ){
+   var xx = 20+(draw.width-40)/49*i;
+   var yy = hh-profits[i+50].n/max_hit*hh;
+   draw.beginPath();
+   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   draw.fill();
+   draw.fillText( ""+profits[i+50].n, xx, yy+draw.width/200+5 );
+  }
+ }
+ if( t_y ){
+  draw.fillStyle = "#ff0";
+  for( var i=0; i<50; i++ ){
+   var xx = 20+(draw.width-40)/49*i;
+   var div = profits[i+50].r/profits[i+50].n;
+   var yy = hh-div/max_div*hh;
+   draw.beginPath();
+   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   draw.fill();
+   draw.fillText( ""+div, xx, yy+draw.width/200+5 );
+  }
+ }
+ if( t_b ){
+  draw.fillStyle = "#0ff";
+  for( var i=0; i<50; i++ ){
+   var xx = 20+(draw.width-40)/49*i;
+   var div = profits[i+50].n/total_rolls;
+   var yy = hh-div*hh;
+   draw.beginPath();
+   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   draw.fill();
+   draw.fillText( ""+Math.round(div*10000)/100, xx, yy+draw.width/200+5 );
+  }
+ } if( t_r ){
+  draw.fillStyle = "#f00";
+  for( var i=0; i<50; i++ ){
+   var xx = 20+(draw.width-40)/49*i;
+   var pro = profits[i+50].r;
+   var yy = hh-pro/max_pro*hh;
+   draw.beginPath();
+   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   draw.fill();
+   if( compare >= 50 && compare <= 99 ){
+    if( pro < profits[compare].r ){
+     draw.fillStyle = "#000";
+     draw.beginPath();
+     draw.arc( xx, yy, draw.width/300, 0, 6.3 );
+     draw.fill();
+     draw.fillStyle = "#f00";
+    }
+   }
+   draw.fillText( ""+profits[i+50].r, xx, yy+draw.width/200+5 );
+  }
+  if( compare >= 50 && compare <= 99 ){
+   draw.fillRect( 0, hh-profits[compare].r/max_pro*hh, draw.width, 2 );
+  }
+ }
+ draw.fillStyle = "#fff";
+ draw.textBaseline = "bottom"
+ for( var i=0; i<50; i++ ){
+  draw.fillText( ""+(i+50), 20+(draw.width-40)/49*i, draw.height );
+ }
+ draw.textAlign = "left";
+ draw.textBaseline = "top";
+ draw.fillText( "Total rolls: "+total_rolls, 5, 5 );
+}
+</script>
+</body>
+</html>
