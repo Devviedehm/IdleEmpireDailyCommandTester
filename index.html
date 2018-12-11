@@ -32,20 +32,17 @@ function roll_all( nn ){
  if( nn == NaN ) nn=0;
  total_rolls += nn;
  var n_adds = [];
- for( var i=50; i<100; i++ ){
+ for( var i=0; i<100; i++ ){
   n_adds[i] = 0;
  }
  for( var rolls=0; rolls<nn; rolls++ ){
-  var roll = Math.ceil(Math.random()*100);
-  for( var i=50; i<100; i++ ){
-   if( roll > i ){
-    n_adds[i]++;
-   }
-  }
+  n_adds[ Math.ceil(Math.random()*100) ]++;
  }
  for( var i=50; i<100; i++ ){
-  profits[i].n += n_adds[i];
-  profits[i].r += n_adds[i]*rewards[i];
+  for( var j=i; j<100; j++ ){
+   profits[i].n += n_adds[j];
+   profits[i].r += n_adds[j]*rewards[i];
+  }
  }
  for( var i=50; i<100; i++ ){
   if( max_hit < profits[i].n ) max_hit = profits[i].n;
@@ -184,7 +181,8 @@ function redraw(){
    draw.fill();
    draw.fillText( ""+Math.round(div*10000)/100, xx, yy+draw.width/200+5 );
   }
- } if( t_r ){
+ }
+ if( t_r ){
   draw.fillStyle = "#f00";
   for( var i=0; i<50; i++ ){
    var xx = 20+(draw.width-40)/49*i;
