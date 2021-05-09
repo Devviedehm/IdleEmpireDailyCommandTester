@@ -12,6 +12,7 @@ margin:0px;
 </head>
 <body>
 <script type="text/javascript">
+
 function reward( threshold ){
  return 2*Math.round(10/(1-threshold/100));
 }
@@ -136,6 +137,41 @@ function window_resize(){
  redraw();
 }
 
+function drawCoolShape(xx, yy, color){
+   draw.strokeStyle = color;
+   draw.lineWidth = 3;
+
+   draw.beginPath();
+   draw.moveTo(xx-10, yy-10);
+   draw.lineTo(xx+10, yy+10);
+   draw.stroke();
+
+   draw.beginPath();
+   draw.moveTo(xx-10, yy+10);
+   draw.lineTo(xx+10, yy-10);
+   draw.stroke();
+
+   draw.beginPath();
+   draw.moveTo(xx, yy-20);
+   draw.lineTo(xx-10, yy-10);
+   draw.stroke();
+
+   draw.beginPath();
+   draw.moveTo(xx+10, yy-10);
+   draw.lineTo(xx+20, yy);
+   draw.stroke();
+
+   draw.beginPath();
+   draw.moveTo(xx+10, yy+10);
+   draw.lineTo(xx, yy+20);
+   draw.stroke();
+
+   draw.beginPath();
+   draw.moveTo(xx-10, yy+10);
+   draw.lineTo(xx-20, yy);
+   draw.stroke();
+}
+
 function redraw(){
  draw.font = "bold 10px monospace";
  draw.clearRect( 0, 0, draw.width, draw.height );
@@ -152,9 +188,10 @@ function redraw(){
   for( var i=0; i<50; i++ ){
    var xx = 20+(draw.width-40)/49*i;
    var yy = hh-profits[i+50].n/max_hit*hh;
-   draw.beginPath();
-   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
-   draw.fill();
+   //draw.beginPath();
+   //draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   drawCoolShape(xx, yy, draw.fillStyle);
+   //draw.fill();
    draw.fillText( ""+profits[i+50].n, xx, yy+draw.width/200+5 );
   }
  }
@@ -164,9 +201,10 @@ function redraw(){
    var xx = 20+(draw.width-40)/49*i;
    var div = profits[i+50].r/profits[i+50].n;
    var yy = hh-div/max_div*hh;
-   draw.beginPath();
-   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
-   draw.fill();
+   //draw.beginPath();
+   //draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   drawCoolShape(xx, yy, draw.fillStyle);
+   //draw.fill();
    draw.fillText( ""+div, xx, yy+draw.width/200+5 );
   }
  }
@@ -176,9 +214,10 @@ function redraw(){
    var xx = 20+(draw.width-40)/49*i;
    var div = profits[i+50].n/total_rolls;
    var yy = hh-div*hh;
-   draw.beginPath();
-   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
-   draw.fill();
+   //draw.beginPath();
+   //draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   drawCoolShape(xx, yy, draw.fillStyle);
+   //draw.fill();
    draw.fillText( ""+Math.round(div*10000)/100, xx, yy+draw.width/200+5 );
   }
  }
@@ -188,9 +227,10 @@ function redraw(){
    var xx = 20+(draw.width-40)/49*i;
    var pro = profits[i+50].r;
    var yy = hh-pro/max_pro*hh;
-   draw.beginPath();
-   draw.arc( xx, yy, draw.width/200, 0, 6.3 );
-   draw.fill();
+   //draw.beginPath();
+   //draw.arc( xx, yy, draw.width/200, 0, 6.3 );
+   drawCoolShape(xx, yy, draw.fillStyle);
+   //draw.fill();
    if( compare >= 50 && compare <= 99 ){
     if( pro < profits[compare].r ){
      draw.fillStyle = "#000";
